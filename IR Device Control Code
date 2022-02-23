@@ -1,0 +1,43 @@
+Get the code at : https://www.dropbox.com/s/iwffofvfperf4op/IR%20device%20control.txt?dl=0
+
+
+#include <IRremote.h>
+
+int RECV_PIN = 11;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+const int SugarPin=9;
+const int LEDpin=8;
+boolean Power=false;
+void setup()
+{
+//  Serial.begin(115200);
+  irrecv.enableIRIn(); // Start the receiver
+  pinMode(SugarPin,OUTPUT);
+  pinMode(LEDpin,OUTPUT);  
+}
+
+void loop() {
+  if (irrecv.decode(&results)) {
+//   Serial.println(results.value, HEX);
+switch(results.value)   
+{
+  case 0xFB38C7:
+  // power on/OFF
+  Power= !Power;
+  if(Power)
+  {
+   analogWrite(SugarPin,64) ;
+   digitalWrite(LEDpin,HIGH);
+   }
+  if(!Power)
+  {
+   analogWrite(SugarPin,12) ;
+   digitalWrite(LEDpin,LOW);
+  }
+  delay(1500);
+  break;
+  }
+  irrecv.resume(); // Receive the next value  
+}
+}
