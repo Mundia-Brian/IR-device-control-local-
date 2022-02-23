@@ -6,7 +6,6 @@ The AC device is simply set as an ON - OFF
 
 In my case:
 
-Power on: 0xFB38C7
-Increase: 0xFBE01F
-Decrease: 0xFBE21D
+Power on/off: 0xFB38C7
+
 
