@@ -1,0 +1,163 @@
+#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
+#include <SoftwareSerial.h>
+#include <IRremote.h>
+#include <Servo.h>
+Servo gate;
+
+LiquidCrystal_I2C lcd(0x27,16,2);
+
+int IR = 11;
+int servoPin = 9;
+int RECV_PIN = 8;
+String IRButton0 = "FF6897";//Gate
+String IRButton1 = "FF30CF";//Security_lights
+String IRButton2 = "FF18E7";//Bedroom_lights
+String IRButton3 = "FF7A85";//Fan
+String IRButton4 = "FF10EF";//Screen
+String IRButton5 = "FFA25D";//Everything
+
+const int screen = 4;// Relay 1
+const int fan = 5;// Relay 2
+const int bedroom_lights = 6;// Relay 3
+const int security_lights = 7;// Relay 4
+
+IRrecv irrecv(RECV_PIN);
+
+decode_results results;
+String BUTTONPRESSED;
+int button0 = 0;
+int button1 = 0;
+int button2 = 0;
+int button3 = 0;
+int button4 = 0;
+int button5 = 0;
+
+void setup()
+{
+  digitalWrite(IR, HIGH);
+  gate.attach(servoPin);
+  
+  Serial.begin(9600);
+  irrecv.enableIRIn(); // Start the receiver
+  pinMode(security_lights, OUTPUT);
+  pinMode(bedroom_lights, OUTPUT);
+  pinMode(fan, OUTPUT);
+  pinMode(screen, OUTPUT);
+}
+
+void loop() {
+  while(irrecv.decode(&results)) {
+    Serial.println(results.value, HEX);
+    BUTTONPRESSED = String(results.value, HEX);
+    BUTTONPRESSED.toUpperCase();
+    Serial.print("BUTTONPRESSED ");
+    Serial.println(BUTTONPRESSED);
+    //delay(1000);
+
+//button 0
+    if (BUTTONPRESSED == IRButton0) {
+      if (button0 == 0) {
+        button0 = 1;
+      }
+      else
+      button0 = 0;
+      if (button0 == 1) {
+        gate.write(0);
+
+      }
+      else
+        gate.write(90);
+        Serial.println("Gate open");
+   
+    }
+
+    //button 1
+    if (BUTTONPRESSED == IRButton1) {
+      if (button1 == 0) {
+        button1 = 1;
+      }
+      else
+        button1 = 0;
+      if (button1 == 1) {
+        digitalWrite(security_lights, HIGH);
+
+    }
+      else
+        digitalWrite(security_lights, LOW);
+        
+    }
+
+    //button 2
+    if (BUTTONPRESSED == IRButton2) {
+      if (button2 == 0) {
+        button2 = 1;
+      }
+      else
+        button2 = 0;
+      if (button2 == 1) {
+        digitalWrite(bedroom_lights, HIGH);
+     
+      }
+      else
+        digitalWrite(bedroom_lights, LOW);
+    }
+
+    //button 3
+    if (BUTTONPRESSED == IRButton3) {
+      if (button3 == 0) {
+        button3 = 1;
+      }
+      else
+        button3 = 0;
+      if (button3 == 1) {
+        digitalWrite(fan, HIGH);
+
+            }
+      else
+        digitalWrite(fan, LOW);
+    }
+
+    //button 4
+    if (BUTTONPRESSED == IRButton4) {
+      if (button4 == 0) {
+        button4 = 1;
+      }
+      else
+        button4 = 0;
+      if (button4 == 1) {
+        digitalWrite(screen, HIGH);
+             }
+      else
+        digitalWrite(screen, LOW);
+    }
+
+//button 5
+if (BUTTONPRESSED == IRButton5) {
+      if (button5 == 0) {
+        button5 = 1;
+      }
+      else
+        button5 = 0;
+      if (button5 == 1) 
+       { digitalWrite(security_lights, HIGH);
+        digitalWrite(bedroom_lights, HIGH);
+        digitalWrite(fan, HIGH);
+        digitalWrite(screen, HIGH);
+        gate.write(90);
+        delay(1000);
+        }
+             
+      else
+        {digitalWrite(security_lights, LOW);
+        digitalWrite(bedroom_lights, LOW);
+        digitalWrite(fan, LOW);
+        digitalWrite(screen, LOW);
+        gate.write(0);
+        delay(1000);
+    }
+    }
+    irrecv.resume(); // Receive the next value
+  }
+
+}\
